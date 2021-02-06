@@ -3,13 +3,13 @@ import Person from "./Person/Person";
 
 class Persons extends Component {
 
-    static getDerivedStateFromProps(props, state) {
-        console.log('Persons.js getDerivedStateFromProps')
-    }
-
     shouldComponentUpdate(nextProps, nextState) {
         console.log('Persons.js should component update');
-        return true;
+        if(nextProps.persons !== this.props.persons) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     getSnapshotBeforeUpdate(prevProps, prevState) {
@@ -19,6 +19,10 @@ class Persons extends Component {
 
     componentDidUpdate() {
         console.log('Persons.js componentDIdUpdate');
+    }
+
+    componentWillUnmount() {
+        console.log('Persons.js componentWillUnmount');
     }
 
     render() {
