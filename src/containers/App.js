@@ -4,6 +4,7 @@ import Cockpit from "../components/Cockpit/Cockpit";
 import Aux from '../hoc/Auxiliary';
 import withClass from '../hoc/withClass';
 import classes from './App.module.css';
+import AuthContext from '../context/auth-context';
 
 class App extends Component {
 
@@ -20,7 +21,9 @@ class App extends Component {
     ],
     otherState: "This is other state",
     showPersons: false,
-    showCockpit: true
+    showCockpit: true,
+    counter: 0,
+    authenticated: false
   };
 
   static getDerivedStateFromProps(props, state) {
@@ -56,8 +59,11 @@ class App extends Component {
     const persons = [...this.state.persons];
     persons[index] = person;
 
-    this.setState({
-      persons: persons,
+    this.setState((prevState, props) => {
+      return {
+        persons: persons,
+        counter: prevState.counter + 1
+      }
     });
   };
 
@@ -77,6 +83,10 @@ class App extends Component {
     this.setState({showCockpit: !cockpit});
   }
 
+  loginHandler = () => {
+    this.setState({authenticated: true});
+  }
+
   render() {
     console.log('App.js render')
     let persons = null;
@@ -87,6 +97,7 @@ class App extends Component {
           persons={this.state.persons}
           clicked={this.deletePersonHandler}
           changed={this.nameChangeHandler}
+          isAthenticated={this.state.authenticated}
         />
       );
     }
@@ -94,8 +105,15 @@ class App extends Component {
     return (
       <Aux>
         <button onClick={this.toggleCockpit}>Toggle Cockpit</button>
-        {this.state.showCockpit ? <Cockpit personsLength={this.state.persons.length} clicked={this.togglePersonsHandler} /> : null}
-        {persons}
+        <AuthContext.Provider value={{authenticated: this.state.authenticated, login: this.loginHandler}}>
+          {this.state.showCockpit ? (
+            <Cockpit
+              personsLength={this.state.persons.length}
+              clicked={this.togglePersonsHandler}
+            />
+          ) : null}
+          {persons}
+        </AuthContext.Provider>
         <p>{this.state.otherState}</p>
       </Aux>
     );
